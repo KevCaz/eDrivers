@@ -1,0 +1,25 @@
+Package: eDrivers
+Title: St. Lawrence Environmental Drivers Data from St. Lawrence Global Observatory's API
+Version: 0.0.0.9000
+Date: 2018-12-04
+Authors@R:
+    person(given = "David",
+           family = "Beauchesne",
+           role = c("aut", "cre"),
+           email = "david.beauchesne@hotmail.com")
+Description: This package accesses environmental drivers data (e.g. fisheries,
+    shipping, hypoxia) for the estuary and gulf of St. Lawrence in eastern
+    Canada through the St. Lawrence Global Observatory's (SLGO; www.ogsl.ca/en)
+    API.
+License:
+URL: https://github.com/eDrivers/eDrivers/
+BugReports: URL: https://github.com/eDrivers/eDrivers/issues/
+Encoding: UTF-8
+LazyData: true
+Depends:
+    methods,
+    R (>= 3.3.0),
+    raster
+Imports:
+    raster,
+    eDrivers
