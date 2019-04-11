@@ -8,26 +8,28 @@
 #' - returns:
 #'  - list containing:
 #'     1. data queried (rasterstack)
-#'     2. citation (data.frame)
+#'     2. citation (bibtex entries)
 #'     3. metadata (list of matrices?)
 #'  - imports individual rasters, citations and metadata for queried drivers data
 #'
 #' @examples
 #' # Example 1
-#' drivers <- fetchDrivers(drivers = c('fishDD', 'fishDNH', 'shipping'))
+#' drivers <- fetchDrivers(drivers = c('DD', 'DNH', 'SHP'))
 #'
-#'
+#' output <- '/users/davidbeauchesne/desktop/test/'
 fetchDrivers <- function(drivers,
                          output = NULL,
                          import = T) {
 
-# Param
-nDr <- length(drivers) # Number of drivers
-
 # Import data
-data(list = drivers, envir=environment())
-data(citations)
+data(driversList)
+data(eDriversBib)
 # data(metadata)
+nDr <- length(drivers) # Number of drivers
+id <- driversList$Accronym %in% drivers
+drNames <- driversList$FileName[id]
+data(list = drNames, envir=environment())
+
 
 # Export to output folder
   # -------------------------------#
@@ -44,7 +46,7 @@ data(citations)
 
   # Export rasterbrick
   for(i in 1:nDr) {
-    raster::writeRaster(x = get(drivers[i]),
+    raster::writeRaster(x = get(drNames[i]),
                         filename = paste0(output, drivers[i], '.tif'),
                         format = 'GTiff',
                         overwrite = TRUE)
@@ -53,11 +55,14 @@ data(citations)
   # ---------------------------------#
   # ------      Citations      ------#
   # ---------------------------------#
-  id <- c('platform', drivers)
-  cite <- citations[citations$name %in% id, ]
-  write.csv(cite,
-            file = paste0(output, 'citations.csv'),
-            row.names = F)
+  cite <- c('beauchesne2019', driversList$Source[id])
+  citeNames <- c('eDrivers', drivers)
+  for(i in 1:length(cite)) {
+    bibtex::write.bib(bib[[cite[i]]],
+                      file = paste0(output, citeNames[i], '.bib'),
+                      verbose = F)
+  }
+
 
 
   # ------------------------------#
@@ -79,8 +84,9 @@ data(citations)
       eD$Drivers <- raster::brick(rDrivers)
 
     # Citations
-      eD$Citations <- read.csv(paste0(output, 'citations.csv'),
-                               stringsAsFactors = F)
+      eD$Citations <- driversList[id, c('Groups','Drivers','Accronym','Source')]
+      eD$Citations$Source <- format(bib[[eD$Citations$Source]], type = 'text')
+      eD$Citations$Source <- gsub("[\n]", " ", eD$Citations$Source)
 
     # Metadata
       # TO BE DONE
