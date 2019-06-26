@@ -4,11 +4,11 @@
 #'     - driver: character vector containing the names of the drivers to fetch
 #'     - output: character, file output location, default is current working directory
 #'     - import: logical, \code{TRUE} whether to import the data in R
-#'     - stack: create raster stack with imported data
+#'     - brick: create raster brick with imported data
 #'
 #' - returns:
 #'  - list containing:
-#'     1. data queried (rasterstack)
+#'     1. data queried (rasterbrick)
 #'     2. citation (bibtex entries)
 #'     3. metadata (list of matrices?)
 #'  - imports individual rasters, citations and metadata for queried drivers data
@@ -16,26 +16,22 @@
 #' @examples
 #' # Example 1
 #' drivers <- fetchDrivers(drivers = c('DD', 'DNH', 'SHP'))
+#' drivers <- fetchDrivers(drivers = c('DD', 'DNH', 'SHP', 'X'))
+#' drivers <- fetchDrivers(drivers = c('FisheriesDD', 'FisheriesDNH', 'Shipping'))
 #'
-#' output <- '/users/davidbeauchesne/desktop/test/'
+
 fetchDrivers <- function(drivers,
                          output = NULL,
                          import = T,
-                         stack = T) {
+                         brick = F) {
 
-# Import data
-data(driversList)
-data(eDriversBib)
-
-nDr <- length(drivers) # Number of drivers
-id <- driversList$Key %in% drivers
-drNames <- driversList$FileName[id]
-data(list = drNames, package = 'eDrivers', envir = environment())
-
-
-# Export to output folder
   # -------------------------------#
-  # ------      Rasters      ------#
+  # ------     PARAMETERS    ------#
+  # -------------------------------#
+  drNames <- paramDrivers(drivers)
+
+  # -------------------------------#
+  # ------      OUTPUT       ------#
   # -------------------------------#
   # Check for output specification
   if(is.null(output)) output <- getwd()
@@ -46,73 +42,50 @@ data(list = drNames, package = 'eDrivers', envir = environment())
   # If not, add it
   if(x != '/') output <- paste0(output, '/')
 
-  # Export rasters
-  for(i in 1:nDr) {
-    raster::writeRaster(x = get(drNames[i]),
-                        filename = paste0(output, drNames[i], '.tif'),
+
+  # -------------------------------#
+  # ------       LOAD        ------#
+  # -------------------------------#
+  # Load drivers queried
+  # These will eventually be API calls to the SLGO web portal
+  data(list = drNames,
+       package = 'eDrivers',
+       envir = environment())
+
+
+  # -------------------------------#
+  # ------      EXPORT       ------#
+  # -------------------------------#
+  # Export data
+  for(i in drNames) {
+    # Raster
+    raster::writeRaster(x = get(i)$Data,
+                        filename = paste0(output, i, '.tif'),
                         format = 'GTiff',
                         overwrite = TRUE)
-  }
 
-  # ---------------------------------#
-  # ------      Citations      ------#
-  # ---------------------------------#
-  cite <- c('beauchesne2019', driversList$Source[id])
-  citeNames <- c('eDrivers', drNames)
-  for(i in 1:length(cite)) {
-    bibtex::write.bib(bib[[cite[i]]],
-                      file = paste0(output, citeNames[i], '.bib'),
+    # Metadata
+    yaml::write_yaml(x = get(i)$Metadata,
+                     file = paste0(output, i, '.yaml'))
+
+    # Source
+    bibtex::write.bib(entry = get(i)$Source,
+                      file = paste0(output, i, '.bib'),
                       verbose = F)
   }
 
-  # ---------------------------------#
-  # ------      Metadata       ------#
-  # ---------------------------------#
-  idMeta <- which(names(meta) %in%drNames)
-  for(i in idMeta)
-    yaml::write_yaml(x = meta[[i]],
-                     file = paste0())
+  # Export platform citation
+  bibtex::write.bib(entry = eDriversBib,
+                    file = paste0(output, 'eDriversBib.bib'),
+                    verbose = F)
 
-    yaml::write_yaml()
-
-    write_yaml(x, file, fileEncoding = "UTF-8", ...)
-
-  }
-  #
 
   # ------------------------------#
-  # ------      Import      ------#
+  # ------      IMPORT      ------#
   # ------------------------------#
   if(import) {
-    # Create list to store eDrivers object including rasterbrick, citations and metadata
-    # Empty list
-    eD <- vector('list', 3)
-    names(eD) <- c('Drivers','Citations','Metadata')
-
-    # Rasters
-      # Load fetched rasters
-      rDrivers <- vector('list', nDr)
-      names(rDrivers) <- drivers
-      for(i in 1:nDr) rDrivers[[i]] <- raster::raster(paste0(output, drivers[i], '.tif'))
-
-      # Create rasterbrick with raster data
-      eD$Drivers <- raster::brick(rDrivers)
-
-    # Citations
-      eD$Citations <- driversList[id, c('Groups','Drivers','Key','Source')]
-      eD$Citations$Source <- format(bib[[eD$Citations$Source]], type = 'text')
-      eD$Citations$Source <- gsub("[\n]", " ", eD$Citations$Source)
-
-    # Metadata
-      # TO BE DONE
-
-    # Create class object
-    class(eD) <- 'eDrivers'
+    importDrivers(drivers,
+                  input = output,
+                  brick = brick)
   }
-
-
-  # ------------------------------#
-  # ------      Return      ------#
-  # ------------------------------#
-  return(eD)
 }
