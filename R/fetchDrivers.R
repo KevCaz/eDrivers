@@ -4,6 +4,7 @@
 #'     - driver: character vector containing the names of the drivers to fetch
 #'     - output: character, file output location, default is current working directory
 #'     - import: logical, \code{TRUE} whether to import the data in R
+#'     - stack: create raster stack with imported data
 #'
 #' - returns:
 #'  - list containing:
@@ -19,16 +20,17 @@
 #' output <- '/users/davidbeauchesne/desktop/test/'
 fetchDrivers <- function(drivers,
                          output = NULL,
-                         import = T) {
+                         import = T,
+                         stack = T) {
 
 # Import data
 data(driversList)
 data(eDriversBib)
-# data(metadata)
+
 nDr <- length(drivers) # Number of drivers
-id <- driversList$Accronym %in% drivers
+id <- driversList$Key %in% drivers
 drNames <- driversList$FileName[id]
-data(list = drNames, envir=environment())
+data(list = drNames, package = 'eDrivers', envir = environment())
 
 
 # Export to output folder
@@ -44,10 +46,10 @@ data(list = drNames, envir=environment())
   # If not, add it
   if(x != '/') output <- paste0(output, '/')
 
-  # Export rasterbrick
+  # Export rasters
   for(i in 1:nDr) {
     raster::writeRaster(x = get(drNames[i]),
-                        filename = paste0(output, drivers[i], '.tif'),
+                        filename = paste0(output, drNames[i], '.tif'),
                         format = 'GTiff',
                         overwrite = TRUE)
   }
@@ -56,14 +58,27 @@ data(list = drNames, envir=environment())
   # ------      Citations      ------#
   # ---------------------------------#
   cite <- c('beauchesne2019', driversList$Source[id])
-  citeNames <- c('eDrivers', drivers)
+  citeNames <- c('eDrivers', drNames)
   for(i in 1:length(cite)) {
     bibtex::write.bib(bib[[cite[i]]],
                       file = paste0(output, citeNames[i], '.bib'),
                       verbose = F)
   }
 
+  # ---------------------------------#
+  # ------      Metadata       ------#
+  # ---------------------------------#
+  idMeta <- which(names(meta) %in%drNames)
+  for(i in idMeta)
+    yaml::write_yaml(x = meta[[i]],
+                     file = paste0())
 
+    yaml::write_yaml()
+
+    write_yaml(x, file, fileEncoding = "UTF-8", ...)
+
+  }
+  #
 
   # ------------------------------#
   # ------      Import      ------#
@@ -84,7 +99,7 @@ data(list = drNames, envir=environment())
       eD$Drivers <- raster::brick(rDrivers)
 
     # Citations
-      eD$Citations <- driversList[id, c('Groups','Drivers','Accronym','Source')]
+      eD$Citations <- driversList[id, c('Groups','Drivers','Key','Source')]
       eD$Citations$Source <- format(bib[[eD$Citations$Source]], type = 'text')
       eD$Citations$Source <- gsub("[\n]", " ", eD$Citations$Source)
 

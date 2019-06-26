@@ -37,8 +37,6 @@ rsconnect/
 
 # Files to ignore
 notes.md
-test/
-testData.R
 
 #iOS file
 .DS_Store

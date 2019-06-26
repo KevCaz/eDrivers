@@ -22,4 +22,5 @@ Depends:
     raster
 Imports:
     raster,
-    eDrivers
+    RefManageR,
+    yaml
