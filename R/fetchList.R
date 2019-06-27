@@ -1,39 +1,34 @@
-#' - `fetchList()`:
-#'   - fetches the list of data available through SLGO's API
-#'   - arguments:
+#' Fetches the list of drivers available
 #'
-#' - returns list containing
-#'   - data.frame containing list of drivers with sources
-#'   - data.frame with bibliography
+#' Fetches and return a table with the list of driver available through the
+#' `eDrivers` R package.
+#'
+#' @return An data.frame with details on drivers available containing driver
+#' groups (Groups), driver names (Drivers), driver keys used for queries
+#' (Key), name of files (FileName), which can also be used for
+#' queries, and data source (Source).
+#'
+#' @export
 #'
 #' @examples
-#' drivers <- fetchList()
-#'
+#' \donttest{
+#' res1 <- fetchList()
+#' res1
+#' }
 
 fetchList <- function() {
-  # Load drivers list and bibtex file
-  data(driversList)
-  data(eDriversBib)
-  library(RefManageR)
-
-  # List
-  eD <- vector('list', 2)
-  names(eD) <- c('drivers', 'bibliography')
+  # Load drivers list
+  data(driversList,
+       package = 'eDrivers',
+       envir = environment())
 
   # Data.frame of data available
-  eD$drivers <- driversList[, c('Groups','Drivers','Key','Source')]
+  drList <- driversList[, c('Groups','Drivers','Key','FileName','Source')]
+  rownames(drList) <- NULL
 
-  # Citations
-  for(i in eD$drivers$Source) Cite(bib[[i]])
-    
-  # Citations
-  for(i in 1:nrow(eD$drivers)) {
-    eD$drivers$Source[i] <- TextCite(bib[[eD$drivers$Source[i]]], .opts = list(max.names = 1))
-  }
+  # Print kable
+  print(knitr::kable(drList))
 
-  # Bibliography
-  capture.output(eD$bibliography <- PrintBibliography(bib))
-
-  # Return object
-  return(eD)
+  # Assign object with data table
+  assign('drList', drList, envir = .GlobalEnv)
 }

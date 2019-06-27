@@ -1,7 +1,7 @@
 #' Import driver layers from memory
 #'
 #' Imports driver layers with accompanying attributes (metadata and source) for
-#' a list of drivers
+#' a selection of drivers
 #'
 #' @param drivers a vector of characters indicating the queried drivers as keys
 #' or file names. Consult list of drivers using the `fetchList()` function to
@@ -13,36 +13,36 @@
 #' a single `RasterBrick` object containing all drivers queried. See
 #' `brickDrivers()` for further details.
 #'
-#' @return if brick is `TRUE`
+#' @return if brick is `FALSE`, `eDrivers` objects are returned, one for each
+#' driver queried, containing a list with:
+#'  [[1]]: Spatial data as a `RasterLayer`
+#'  [[2]]: Metadata as a `yaml`
+#'  [[3]]: Sources as a `BibEntry`
+#' if brick is `TRUE`, an `eDriversBrick` object containing a list with:
+#'  [[1]]: RasterBrick` with drivers queried
+#'  [[2]]: list containing metadata for each driver queried
+#'  [[3]]: list containing sources for each driver queried
 #'
 #' @export
 #'
 #' @examples
 #' \donttest{
-#' res1 <- importDrivers
+#' # Example 1
+#' res1 <- importDrivers(drivers = c('SST+','SST-'))
+#' res1
+#' summary(res1)
+#' plot(res1)
+#'
+#' Example 2
+#' res2 <- importDrivers(drivers = c('SST+','SST-'), brick = T)
+#' res1
+#' summary(res1)
+#' plot(res1)
 #' }
-
-
-
-#' - `fetchList()`:
-#'   - fetches the list of data available through SLGO's API
-#'   - arguments:
-#'
-#' - returns list containing
-#'   - data.frame containing list of drivers with sources
-#'   - data.frame with bibliography
-#'
-#' @examples
-#' drivers <- fetchList()
-#'
 
 importDrivers <- function(drivers,
                           input = NULL,
                           brick = F) {
-  #
-  # drivers = c('DD', 'DNH', 'SHP')
-  # input = NULL
-  # brick = F
 
   # -------------------------------#
   # ------     PARAMETERS    ------#
@@ -103,8 +103,5 @@ importDrivers <- function(drivers,
     assign('eDriversBrick',
            brickDrivers(drivers),
            envir = .GlobalEnv)
-
-    # eDriversBrick <- brickDrivers(drivers)
-    # return(eDriversBrick)
   }
 }
