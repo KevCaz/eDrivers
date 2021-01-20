@@ -22,4 +22,5 @@ Depends:
 Imports:
     raster,
     RefManageR,
-    yaml
+    yaml,
+    bibtex
