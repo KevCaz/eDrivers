@@ -86,10 +86,12 @@ fetchDrivers <- function(drivers,
   # Export data
   for(i in drNames) {
     # Raster
-    raster::writeRaster(x = get(i)$Data,
+    dat <- get(i)$Data %>% st_transform(3246)
+    raster::writeRaster(x = dat,
                         filename = paste0(output, i, '.tif'),
                         format = 'GTiff',
-                        overwrite = TRUE)
+                        overwrite = TRUE,
+                        NAflag = -1)
 
     # Metadata
     yaml::write_yaml(x = get(i)$Metadata,
