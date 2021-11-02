@@ -86,7 +86,7 @@ fetchDrivers <- function(drivers,
   # Export data
   for(i in drNames) {
     # Raster
-    dat <- get(i)$Data %>% st_transform(3246)
+    dat <- get(i)$Data %>% projectRaster(crs = 32198)
     raster::writeRaster(x = dat,
                         filename = paste0(output, i, '.tif'),
                         format = 'GTiff',
