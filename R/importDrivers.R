@@ -28,22 +28,16 @@
 #' @examples
 #' \donttest{
 #' # Example 1
-#' res1 <- importDrivers(drivers = c('SST+','SST-'))
-#' res1
-#' summary(res1)
-#' plot(res1)
+#' fetchDrivers(c("SST+", "SST-"))
+#' res1 <- importDrivers(drivers = c("SST+", "SST-"))
 #'
-#' Example 2
-#' res2 <- importDrivers(drivers = c('SST+','SST-'), brick = T)
-#' res1
-#' summary(res1)
-#' plot(res1)
+#' # Example 2
+#' res2 <- importDrivers(drivers = c("SST+", "SST-"), brick = TRUE)
+#'
 #' }
-
 importDrivers <- function(drivers,
                           input = NULL,
-                          brick = F) {
-
+                          brick = FALSE) {
   # -------------------------------#
   # ------     PARAMETERS    ------#
   # -------------------------------#
@@ -54,54 +48,60 @@ importDrivers <- function(drivers,
   # ------    INPUT SPEC     ------#
   # -------------------------------#
   # Check for input specification
-  if(is.null(input)) input <- getwd()
+  if (is.null(input)) input <- getwd()
 
   # Check whether the last character is a "/"
   x <- substr(input, nchar(input), nchar(input))
 
   # If not, add it
-  if(x != '/') input <- paste0(input, '/')
+  if (x != "/") input <- paste0(input, "/")
 
 
   # ------------------------------#
   # ------      IMPORT      ------#
   # ------------------------------#
   # Create objects and import data
-  for(i in drNames) {
+  for (i in drNames) {
     # Raster data
-    r <- raster::raster(paste0(input, i, '.tif'))
+    r <- raster::raster(paste0(input, i, ".tif"))
 
     # Metadata
-    meta <- yaml::read_yaml(paste0(input, i, '.yaml'))
+    meta <- yaml::read_yaml(paste0(input, i, ".yaml"))
 
     # Source
-    bib <- RefManageR::ReadBib(paste0(input, i, '.bib'))
+    bib <- RefManageR::ReadBib(paste0(input, i, ".bib"))
 
     # Assign to driver name
-    assign(i,
-      list(Data = r,
-           Metadata = meta,
-           Source = bib))
+    assign(
+      i,
+      list(
+        Data = r,
+        Metadata = meta,
+        Source = bib
+      )
+    )
   }
 
   # -----------------------------------#
   # ------   INDIVIDUAL LAYERS   ------#
   # -----------------------------------#
-  if(!brick) {
-    for(i in drNames) {
+  if (!brick) {
+    for (i in drNames) {
       # eDrivers class object
       assign(i,
-          structure(get(i), class = 'eDrivers'),
-          envir = .GlobalEnv)
+        structure(get(i), class = "eDrivers"),
+        envir = .GlobalEnv
+      )
     }
   }
 
   # ------------------------------#
   # ------      BRICK       ------#
   # ------------------------------#
-  if(brick) {
-    assign('eDriversBrick',
-           brickDrivers(drivers),
-           envir = .GlobalEnv)
+  if (brick) {
+    assign("eDriversBrick",
+      brickDrivers(drivers),
+      envir = .GlobalEnv
+    )
   }
 }

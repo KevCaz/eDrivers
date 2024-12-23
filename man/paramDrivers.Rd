@@ -22,6 +22,6 @@ queried drivers
 }
 \examples{
 \donttest{
-paramDrivers()
+paramDrivers(c("SST+", "SST-"))
 }
 }

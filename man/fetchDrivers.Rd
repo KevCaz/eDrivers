@@ -4,7 +4,7 @@
 \alias{fetchDrivers}
 \title{Downloads and imports driver layers}
 \usage{
-fetchDrivers(drivers, output = NULL, import = T, brick = F)
+fetchDrivers(drivers, output = NULL, import = TRUE, brick = FALSE)
 }
 \arguments{
 \item{drivers}{a vector of characters indicating the queried drivers as keys
@@ -40,20 +40,14 @@ Downloads and imports queried driver layers with accompanying attributes
 (metadata and source) for a selection of drivers
 }
 \examples{
-\donttest{
+\dontrun{
 # Example 1
-res1 <- fetchDrivers(drivers = c('SST+','SST-'), import = F)
+res1 <- fetchDrivers(drivers = c("SST+", "SST-"), import = FALSE)
 
 # Example 2
-res2 <- importDrivers(drivers = c('SST+','SST-'), import = T, brick = F)
-res2
-summary(res2)
-plot(res2)
+res2 <- fetchDrivers(drivers = c("SST+", "SST-"), import = TRUE, brick = FALSE)
 
-Example 3
-res3 <- importDrivers(drivers = c('SST+','SST-'), import = T, brick = T)
-res3
-summary(res3)
-plot(res3)
+# Example 3
+res3 <- fetchDrivers(drivers = c("SST+", "SST-"), import = TRUE, brick = TRUE)
 }
 }

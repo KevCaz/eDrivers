@@ -10,18 +10,20 @@ Authors@R:
 Description: This package accesses data on drivers of environmental change (e.g. fisheries,
     shipping, hypoxia) for the estuary and gulf of St. Lawrence in eastern
     Canada.
-License:
+License:MIT + file LICENSE
 URL: https://github.com/eDrivers/eDrivers/
 BugReports: URL: https://github.com/eDrivers/eDrivers/issues/
 Encoding: UTF-8
 LazyData: true
 Depends:
-    methods,
-    R (>= 3.3.0),
-    raster
+    R (>= 3.3.0)
 Imports:
+    bibtex,
+    knitr,
+    magrittr,
     raster,
     RefManageR,
-    yaml,
-    bibtex
-RoxygenNote: 7.1.1
+    yaml
+Suggests:
+    codetools
+RoxygenNote: 7.3.2

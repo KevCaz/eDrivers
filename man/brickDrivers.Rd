@@ -23,7 +23,7 @@ Uses a list of `eDrivers` objects to create a `eDriversBrick`, which is a `raste
 with additionnal attributes and data associated with `eDrivers` objects
 }
 \examples{
-\donttest{
+\dontrun{
 res1 <- brickDrivers(c('CoastalDevelopment','PositiveSST'))
 res1
 summary(res1)

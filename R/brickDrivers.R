@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' res1 <- brickDrivers(c('CoastalDevelopment','PositiveSST'))
 #' res1
 #' summary(res1)
@@ -40,7 +40,7 @@ brickDrivers <- function(drivers) {
   # List of metadata (m)
   # List of sources (s)
   r <- m <- s <-  list()
-  for(i in 1:length(drNames)) {
+  for(i in seq_len(length(drNames))) {
     # Data in lists
     r[[i]] <- get(drNames[i])$Data
     m[[i]] <- get(drNames[i])$Metadata

@@ -27,31 +27,26 @@
 #'  [[2]]: list containing metadata for each driver queried
 #'  [[3]]: list containing sources for each driver queried
 #'
+#' @importFrom magrittr `%>%`
+#'
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Example 1
-#' res1 <- fetchDrivers(drivers = c('SST+','SST-'), import = F)
+#' res1 <- fetchDrivers(drivers = c("SST+", "SST-"), import = FALSE)
 #'
 #' # Example 2
-#' res2 <- importDrivers(drivers = c('SST+','SST-'), import = T, brick = F)
-#' res2
-#' summary(res2)
-#' plot(res2)
+#' res2 <- fetchDrivers(drivers = c("SST+", "SST-"), import = TRUE, brick = FALSE)
 #'
-#' Example 3
-#' res3 <- importDrivers(drivers = c('SST+','SST-'), import = T, brick = T)
-#' res3
-#' summary(res3)
-#' plot(res3)
+#' # Example 3
+#' res3 <- fetchDrivers(drivers = c("SST+", "SST-"), import = TRUE, brick = TRUE)
 #' }
 
 fetchDrivers <- function(drivers,
                          output = NULL,
-                         import = T,
-                         brick = F) {
-
+                         import = TRUE,
+                         brick = FALSE) {
   # -------------------------------#
   # ------     PARAMETERS    ------#
   # -------------------------------#
@@ -61,13 +56,13 @@ fetchDrivers <- function(drivers,
   # ------      OUTPUT       ------#
   # -------------------------------#
   # Check for output specification
-  if(is.null(output)) output <- getwd()
+  if (is.null(output)) output <- getwd()
 
   # Check whether the last character is a "/"
   x <- substr(output, nchar(output), nchar(output))
 
   # If not, add it
-  if(x != '/') output <- paste0(output, '/')
+  if (x != "/") output <- paste0(output, "/")
 
 
   # -------------------------------#
@@ -75,46 +70,58 @@ fetchDrivers <- function(drivers,
   # -------------------------------#
   # Load drivers queried
   # These will eventually be API calls to the SLGO web portal
-  data(list = drNames,
-       package = 'eDrivers',
-       envir = environment())
+  data(
+    list = drNames,
+    package = "eDrivers",
+    envir = environment()
+  )
 
 
   # -------------------------------#
   # ------      EXPORT       ------#
   # -------------------------------#
   # Export data
-  for(i in drNames) {
+  for (i in drNames) {
     # Raster
-    dat <- get(i)$Data %>% projectRaster(crs = 32198)
-    raster::writeRaster(x = dat,
-                        filename = paste0(output, i, '.tif'),
-                        format = 'GTiff',
-                        overwrite = TRUE,
-                        NAflag = -1)
+    dat <- get(i)$Data %>%
+      raster::projectRaster(crs = 32198)
+    raster::writeRaster(
+      x = dat,
+      filename = paste0(output, i, ".tif"),
+      format = "GTiff",
+      overwrite = TRUE,
+      NAflag = -1
+    )
 
     # Metadata
-    yaml::write_yaml(x = get(i)$Metadata,
-                     file = paste0(output, i, '.yaml'))
+    yaml::write_yaml(
+      x = get(i)$Metadata,
+      file = paste0(output, i, ".yaml")
+    )
 
     # Source
-    bibtex::write.bib(entry = get(i)$Source,
-                      file = paste0(output, i, '.bib'),
-                      verbose = F)
+    bibtex::write.bib(
+      entry = get(i)$Source,
+      file = paste0(output, i, ".bib"),
+      verbose = FALSE
+    )
   }
 
   # Export platform citation
-  bibtex::write.bib(entry = eDriversBib,
-                    file = paste0(output, 'eDriversBib.bib'),
-                    verbose = F)
+  bibtex::write.bib(
+    entry = eDriversBib,
+    file = paste0(output, "eDriversBib.bib"),
+    verbose = FALSE
+  )
 
 
   # ------------------------------#
   # ------      IMPORT      ------#
   # ------------------------------#
-  if(import) {
+  if (import) {
     importDrivers(drivers,
-                  input = output,
-                  brick = brick)
+      input = output,
+      brick = brick
+    )
   }
 }

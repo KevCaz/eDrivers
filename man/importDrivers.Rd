@@ -4,7 +4,7 @@
 \alias{importDrivers}
 \title{Import driver layers from memory}
 \usage{
-importDrivers(drivers, input = NULL, brick = F)
+importDrivers(drivers, input = NULL, brick = FALSE)
 }
 \arguments{
 \item{drivers}{a vector of characters indicating the queried drivers as keys
@@ -37,15 +37,11 @@ a selection of drivers
 \examples{
 \donttest{
 # Example 1
-res1 <- importDrivers(drivers = c('SST+','SST-'))
-res1
-summary(res1)
-plot(res1)
+fetchDrivers(c("SST+", "SST-"))
+res1 <- importDrivers(drivers = c("SST+", "SST-"))
 
-Example 2
-res2 <- importDrivers(drivers = c('SST+','SST-'), brick = T)
-res1
-summary(res1)
-plot(res1)
+# Example 2
+res2 <- importDrivers(drivers = c("SST+", "SST-"), brick = TRUE)
+
 }
 }
